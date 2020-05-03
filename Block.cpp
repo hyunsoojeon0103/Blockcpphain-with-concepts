@@ -1,63 +1,70 @@
-#include "Block.h"
-
-Block::Block()
-    : n_index(0), n_nonce(-1), t_time(time(nullptr)), s_data("Genesis Block"), s_prev_hash("0")
+template <class T>
+Block<T>::Block(const std::string &s_data_in)
+    : n_index(0), t_time(time(nullptr)), n_nonce(0)
 {
 }
-Block::Block(const std::string &s_data_in)
-    : n_index(0), n_nonce(-1), t_time(time(nullptr)), s_data(s_data_in)
+template <class T>
+Block<T>::~Block()
 {
 }
-Block::~Block()
+template <class T>
+T Block<T>::get_hash() const
 {
+    return hash;
 }
-std::string Block::get_hash() const
+template <class T>
+void Block<T>::set_prev_hash(const T prev_hash_in)
 {
-    return s_hash;
+    std::string str = prev_hash.ToString();
+    //assert(str.length() == 64);
+    prev_hash = prev_hash_in;
 }
-void Block::set_prev_hash(const std::string &prev_hash)
+template <class T>
+T Block<T>::get_prev_hash() const
 {
-    assert(prev_hash.length() == 64 || prev_hash == "0");
-    s_prev_hash = prev_hash;
+    return prev_hash;
 }
-std::string Block::get_prev_hash() const
-{
-    return s_prev_hash;
-}
-uint32_t Block::get_index() const
+template <class T>
+uint64_t Block<T>::get_index() const
 {
     return n_index;
 }
-void Block::set_n_index(const uint32_t idx)
+template <class T>
+void Block<T>::set_n_index(const uint64_t idx)
 {
     assert(idx >= 0);
     n_index = idx;
 }
-void Block::mine_block(const uint32_t n_difficulty)
+
+template <class T>
+void Block<T>::mine_block(const uint64_t n_difficulty)
 {
     assert(n_difficulty >= 0 && n_difficulty < 64);
     std::string str(n_difficulty, '0');
     do
     {
         n_nonce++;
-        s_hash = calculate_hash();
-    } while (s_hash.substr(0, n_difficulty) != str);
+        hash = calculate_hash();
+
+    } while (hash.ToString().substr(0, n_difficulty) != str);
 }
 
-std::string Block::calculate_hash() const
+template <class T>
+T Block<T>::calculate_hash() const
 {
     std::stringstream str_stream;
-    str_stream << n_index << t_time << s_data << n_nonce << s_prev_hash;
-    return sha256(str_stream.str());
+    str_stream << byte_size << hash << prev_hash << n_index << t_time << n_nonce;
+    return T(sha256(str_stream.str()));
 }
 
-std::ostream &operator<<(std::ostream &out, const Block &block)
+template <class U>
+std::ostream& operator<<(std::ostream &out, const Block<U>& block)
 {
     out << "n_index       : " << block.n_index << '\n'
-        << "n_nonce       : " << block.n_nonce << '\n'
         << "t_time        : " << block.t_time << '\n'
-        << "data          : " << block.s_data << '\n'
-        << "hash          : " << block.s_hash << '\n'
-        << "previous hash : " << block.s_prev_hash << '\n';
+        << "byte_size     : " << block.byte_size << '\n'
+        << "n_nonce       : " << block.n_nonce << '\n'
+        << "hash          : " << block.hash << '\n'
+        << "previous hash : " << block.prev_hash << '\n';
     return out;
 }

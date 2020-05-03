@@ -6,26 +6,29 @@
 #include <cassert>
 #include "sha256.h"
 #include "json.hpp"
+#include "uint256.h"
 
+template <class T>
 class Block
 {
 public:
-    Block();
-    Block(const std::string &s_data_in);
+    Block(const std::string &s_data_in = std::string());
     ~Block();
-    std::string get_hash() const;
-    std::string get_prev_hash() const;
-    uint32_t get_index() const;
-    void set_prev_hash(const std::string &prev_hash);
-    void set_n_index(const uint32_t idx);
-    void mine_block(const uint32_t n_dfficulty);
-    friend std::ostream &operator<<(std::ostream &out, const Block &block);
+    T get_hash() const;
+    T get_prev_hash() const;
+    uint64_t get_index() const;
+    void set_prev_hash(const T prev_hash);
+    void set_n_index(const uint64_t idx);
+    void mine_block(const uint64_t n_dfficulty);
+    template <class U>
+    friend std::ostream& operator <<(std::ostream& out, const Block<U>& block);
 private:
-    uint32_t n_index;
-    int64_t n_nonce;
-    time_t t_time;
-    std::string s_data;
-    std::string s_hash;
-    std::string s_prev_hash;
-    std::string calculate_hash() const;
+    T byte_size;
+    T hash;
+    T prev_hash;
+    uint64_t n_index;
+    uint64_t t_time;
+    uint64_t n_nonce;
+    T calculate_hash() const;
 };
+#include "Block.cpp"
