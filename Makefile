@@ -8,14 +8,14 @@ CXXFLAGS = -g -Wall $(INCLUDES) -std=c++2a
 LDFLAGS= -g
 
 executables = main
-objects = main.o Block.o Blockchain.o sha256.o
+objects = main.o sha256.o
 
 .PHONY: default
 default: $(executables)
 
-$(executables): Block.o Blockchain.o sha256.o
+$(executables): sha256.o
 
-$(objects): Block.h Blockchain.h sha256.h json.hpp
+$(objects): Block.h Blockchain.h sha256.h json.hpp uint256.h
 
 .PHONY: clean
 clean:
